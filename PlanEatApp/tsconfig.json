@@ -9,6 +9,7 @@
     "paths": {
       "@/*": ["./*"]
     },
+    "forceConsistentCasingInFileNames": true,
     "allowJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true
