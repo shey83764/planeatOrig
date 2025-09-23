@@ -13,8 +13,8 @@ interface AnimatedCardProps {
   title: string;
   description: string;
   image: string;
-  onPress?: () => void;
-  index?: number;
+  onPress?: () => void; // ✅ onPress opcional
+  index?: number;       // para animación escalonada
 }
 
 const AnimatedCard: React.FC<AnimatedCardProps> = ({
@@ -37,7 +37,7 @@ const AnimatedCard: React.FC<AnimatedCardProps> = ({
       index * 100,
       withTiming(0, { duration: 400, easing: Easing.out(Easing.exp) })
     );
-  }, []);
+  }, [index, opacity, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateY: translateY.value }],
@@ -48,7 +48,7 @@ const AnimatedCard: React.FC<AnimatedCardProps> = ({
     <Pressable
       onPressIn={() => (scale.value = withSpring(0.95))}
       onPressOut={() => (scale.value = withSpring(1))}
-      onPress={onPress}
+      onPress={onPress ? onPress : undefined} // 👈 asegura que no haya error si no hay onPress
     >
       <Animated.View style={[styles.card, animatedStyle]}>
         <Image source={{ uri: image }} style={styles.cardImage} />

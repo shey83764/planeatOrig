@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
-import usersRoutes from "./routes/users.js";
-import objetivosRoutes from "./routes/objetivos.js";
-import datosRoutes from "./routes/datos.js";
+import usersRoutes from "../servi_backend/src/routes/user.js";
+import objetivosRoutes from "../servi_backend/src/routes/objetivos.js";
+import datosRoutes from "../servi_backend/src/routes/datos.js";
 
 const app = express();
 
@@ -14,4 +14,4 @@ app.use("/api/users", usersRoutes);
 app.use("/api/objetivos", objetivosRoutes);
 app.use("/api/datos", datosRoutes);
 
-export default app;
+export default app; 

@@ -1,69 +1,55 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator } from 'react-native';
-import { theme } from '../theme';
-// import { API } from '../api_conex/api';
+import React from 'react';
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+import { useNavigation } from '@react-navigation/native';
 
-type Recipe = {
-  id: number;
+type DesayunoNavProp = NativeStackNavigationProp<RootStackParamList, 'Desayuno'>;
+
+interface Recipe {
+  id: string;
   title: string;
   description: string;
   image: string;
-};
+}
+
+const recipes: Recipe[] = [
+  {
+    id: 'tostadas-palha-huevo',
+    title: 'Tostadas integrales con palta y huevo',
+    description: 'Nutritiva para empezar el día',
+    image: 'https://source.unsplash.com/400x200/?toast,avocado,egg',
+  },
+];
 
 export default function DesayunoScreen() {
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation<DesayunoNavProp>();
 
-  useEffect(() => {
-  const fetchRecipes = async () => {
-    try {
-      // Aquí va tu fetch cuando la API esté lista
-      // const res = await fetch(`${API}/recipes?mealType=Desayuno`);
-      // const data = await res.json();
-      // setRecipes(data);
-    } catch (error) {
-      console.error('Error fetching breakfast recipes:', error);
-    } finally {
-      setLoading(false); // Esto hace que el loader desaparezca aunque la API no esté
-    }
+  const handleRecipePress = (item: Recipe) => {
+    navigation.navigate('RecipeDetail', { recipeId: item.id, title: item.title });
   };
 
-  fetchRecipes();
-}, []);
-
-  if (loading) return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
-
-  if (!recipes.length)
-    return (
-      <View style={styles.container}>
-        <Text style={styles.noRecipes}>No hay recetas de desayuno</Text>
-      </View>
-    );
-
   return (
-    <FlatList
-      style={styles.container}
-      data={recipes}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.card}>
-          <Image source={{ uri: item.image }} style={styles.image} />
-          <View style={styles.textContainer}>
+    <View style={styles.container}>
+      <FlatList
+        data={recipes}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.card} onPress={() => handleRecipePress(item)}>
+            <Image source={{ uri: item.image }} style={styles.image} />
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.description}>{item.description}</Text>
-          </View>
-        </View>
-      )}
-    />
+          </TouchableOpacity>
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: theme.colors.background },
-  card: { marginBottom: 20, backgroundColor: theme.colors.surface, borderRadius: 12, overflow: 'hidden' },
-  image: { width: '100%', height: 150 },
-  textContainer: { padding: 10 },
-  title: { fontSize: 18, fontFamily: theme.fonts.subtitle, color: theme.colors.title },
-  description: { fontSize: 14, fontFamily: theme.fonts.body, color: theme.colors.body, marginTop: 5 },
-  noRecipes: { fontSize: 16, fontFamily: theme.fonts.body, color: theme.colors.body, textAlign: 'center', marginTop: 50 },
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  card: { marginBottom: 16, borderRadius: 12, overflow: 'hidden', backgroundColor: '#f9f9f9', padding: 12 },
+  image: { width: '100%', height: 150, borderRadius: 8, marginBottom: 8 },
+  title: { fontSize: 18, fontWeight: 'bold' },
+  description: { fontSize: 14, color: '#555' },
 });
