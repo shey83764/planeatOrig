@@ -1,50 +1,53 @@
-// app/screens/Desayuno/TostadasPaltaHuevoScreen.tsx
 import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 
 const nutrients = [
-  { name: "Pan integral", hc: 36, protein: 6, lipid: 0, weight: 60 },
-  { name: "Palta", hc: 1, protein: 1, lipid: 7, weight: 50 },
-  { name: "Huevo", hc: 0, protein: 6, lipid: 6, weight: 50 },
-  { name: "Queso untable descremado", hc: 1, protein: 1.8, lipid: 1.2, weight: 20 },
+  { name: "Cereales (promedio)", hc: 28, protein: 4.8, lipid: 0, weight: 40 },
+  { name: "Leche parcialmente descremada", hc: 10, protein: 6, lipid: 3, weight: 200 },
+  { name: "Frutas frescas (promedio)", hc: 12, protein: 1, lipid: 0, weight: 100 },
+  { name: "Frutas secas", hc: 2.6, protein: 3, lipid: 8.1, weight: 15 },
 ];
 
 const portionNutrition = [
-  { nutrient: "Carbohidratos (g)", amount: 38 },
-  { nutrient: "Proteínas (g)", amount: 14.8 },
-  { nutrient: "Grasas Totales (g)", amount: 14.2 },
-  { nutrient: "Fibra (g)", amount: 5 },
-  { nutrient: "Azúcares (g)", amount: 1 },
+  { nutrient: "Carbohidratos (g)", amount: 70 },
+  { nutrient: "- Azúcares (g)", amount: 41.25 },
+  { nutrient: "- Fibra (g)", amount: 0.5 },
+  { nutrient: "Proteínas (g)", amount: 10 },
+  { nutrient: "Grasas totales (g)", amount: 5 },
+  { nutrient: "Vitamina", amount: "-" },
+  { nutrient: "Mineral", amount: "-" },
 ];
 
-const TostadasPaltaHuevoScreen = () => {
-  const totalHC = nutrients.reduce((acc, n) => acc + n.hc, 0);
-  const totalProtein = nutrients.reduce((acc, n) => acc + n.protein, 0);
-  const totalLipid = nutrients.reduce((acc, n) => acc + n.lipid, 0);
-  const totalKcal = totalHC * 4 + totalProtein * 4 + totalLipid * 9;
+const dailyDiet = [
+  { nutrient: "Carbohidratos", kcal: 1100, percent: "100% VD" },
+  { nutrient: "Proteínas", kcal: 300, percent: "100% VD" },
+  { nutrient: "Lípidos", kcal: 600, percent: "100% VD" },
+];
 
+const AvenaFrutasScreen = () => {
   return (
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={true}
       contentContainerStyle={{ paddingBottom: 40 }}
     >
-      <Text style={styles.title}>🥑 Tostadas integrales con palta y huevo</Text>
+      <Text style={styles.title}>🥣 Avena con frutas y frutos secos</Text>
 
       <Text style={styles.section}>Alimentos:</Text>
-      <Text style={styles.text}>• Pan integral 60 g (2 rebanadas)</Text>
-      <Text style={styles.text}>• Palta 50 g</Text>
-      <Text style={styles.text}>• Huevo 1 grande (50 g)</Text>
-      <Text style={styles.text}>• Queso untable descremado 20 g</Text>
-      <Text style={styles.text}>• Café o té sin azúcar</Text>
+      <Text style={styles.text}>• Avena arrollada 40 g</Text>
+      <Text style={styles.text}>• Leche descremada 200 ml</Text>
+      <Text style={styles.text}>• Banana 100 g</Text>
+      <Text style={styles.text}>• Almendras 15 g</Text>
+      <Text style={styles.text}>• Canela a gusto</Text>
 
       <Text style={styles.section}>Procedimiento:</Text>
-      <Text style={styles.text}>1. Tostar el pan integral.</Text>
-      <Text style={styles.text}>2. Pisar la palta con un poco de sal.</Text>
-      <Text style={styles.text}>3. Cocinar el huevo (hervido o a la plancha).</Text>
       <Text style={styles.text}>
-        4. Untar una tostada con queso, la otra con palta y colocar el huevo encima.
+        1. Calentar la leche y añadir la avena, cocinando 5 min.
       </Text>
+      <Text style={styles.text}>
+        2. Servir en bol, añadir rodajas de banana y almendras picadas.
+      </Text>
+      <Text style={styles.text}>3. Espolvorear con canela.</Text>
 
       {/* Tabla de macronutrientes */}
       <Text style={styles.section}>Macronutrientes por alimento:</Text>
@@ -67,13 +70,7 @@ const TostadasPaltaHuevoScreen = () => {
         ))}
       </View>
 
-      {/* Totales */}
-      <Text style={styles.section}>Totales:</Text>
-      <Text style={styles.text}>
-        HC: {totalHC} g | Proteínas: {totalProtein.toFixed(1)} g | Lípidos: {totalLipid.toFixed(1)} g | Kcal: {totalKcal}
-      </Text>
-
-      {/* Tabla de cuadro nutricional por porción */}
+      {/* Cuadro nutricional por porción */}
       <Text style={styles.section}>Cuadro nutricional por porción:</Text>
       <View style={styles.table}>
         <View style={[styles.row, styles.headerRow]}>
@@ -87,11 +84,28 @@ const TostadasPaltaHuevoScreen = () => {
           </View>
         ))}
       </View>
+
+      {/* Porcentaje de dieta diaria */}
+      <Text style={styles.section}>Para una dieta de 2000 kcal:</Text>
+      <View style={styles.table}>
+        <View style={[styles.row, styles.headerRow]}>
+          <Text style={styles.cell}>Nutriente</Text>
+          <Text style={styles.cell}>Kcal</Text>
+          <Text style={styles.cell}>%VD</Text>
+        </View>
+        {dailyDiet.map((item, index) => (
+          <View key={index} style={styles.row}>
+            <Text style={styles.cell}>{item.nutrient}</Text>
+            <Text style={styles.cell}>{item.kcal}</Text>
+            <Text style={styles.cell}>{item.percent}</Text>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 };
 
-export default TostadasPaltaHuevoScreen;
+export default AvenaFrutasScreen;
 
 const styles = StyleSheet.create({
   container: {

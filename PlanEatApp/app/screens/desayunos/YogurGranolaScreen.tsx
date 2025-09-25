@@ -1,23 +1,28 @@
-// app/screens/Desayuno/TostadasPaltaHuevoScreen.tsx
 import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 
 const nutrients = [
-  { name: "Pan integral", hc: 36, protein: 6, lipid: 0, weight: 60 },
-  { name: "Palta", hc: 1, protein: 1, lipid: 7, weight: 50 },
-  { name: "Huevo", hc: 0, protein: 6, lipid: 6, weight: 50 },
-  { name: "Queso untable descremado", hc: 1, protein: 1.8, lipid: 1.2, weight: 20 },
+  { name: "Yogur descremado", hc: 12, protein: 8, lipid: 6, weight: 200 },
+  { name: "Cereales (promedio)", hc: 21, protein: 3.6, lipid: 0, weight: 30 },
+  { name: "Frutas frescas", hc: 9.6, protein: 0.8, lipid: 0, weight: 80 },
+  { name: "Miel", hc: 4.1, protein: 0, lipid: 0, weight: 5 },
 ];
 
 const portionNutrition = [
-  { nutrient: "Carbohidratos (g)", amount: 38 },
-  { nutrient: "Proteínas (g)", amount: 14.8 },
-  { nutrient: "Grasas Totales (g)", amount: 14.2 },
-  { nutrient: "Fibra (g)", amount: 5 },
-  { nutrient: "Azúcares (g)", amount: 1 },
+  { nutrient: "Carbohidratos (g)", amount: 70 },
+  { nutrient: "  - azúcares (g)", amount: 41.25 },
+  { nutrient: "  - fibra (g)", amount: 0.5 },
+  { nutrient: "Proteínas (g)", amount: 10 },
+  { nutrient: "Grasas totales (g)", amount: 5 },
 ];
 
-const TostadasPaltaHuevoScreen = () => {
+const dailyValues = [
+  { nutrient: "Carbohidratos", kcal: 1100, vd: "100%VD" },
+  { nutrient: "Proteínas", kcal: 300, vd: "100%VD" },
+  { nutrient: "Lípidos", kcal: 600, vd: "100%VD" },
+];
+
+const YogurGranolaScreen = () => {
   const totalHC = nutrients.reduce((acc, n) => acc + n.hc, 0);
   const totalProtein = nutrients.reduce((acc, n) => acc + n.protein, 0);
   const totalLipid = nutrients.reduce((acc, n) => acc + n.lipid, 0);
@@ -29,24 +34,19 @@ const TostadasPaltaHuevoScreen = () => {
       showsVerticalScrollIndicator={true}
       contentContainerStyle={{ paddingBottom: 40 }}
     >
-      <Text style={styles.title}>🥑 Tostadas integrales con palta y huevo</Text>
+      <Text style={styles.title}>🍓 Yogur con granola y frutos rojos</Text>
 
       <Text style={styles.section}>Alimentos:</Text>
-      <Text style={styles.text}>• Pan integral 60 g (2 rebanadas)</Text>
-      <Text style={styles.text}>• Palta 50 g</Text>
-      <Text style={styles.text}>• Huevo 1 grande (50 g)</Text>
-      <Text style={styles.text}>• Queso untable descremado 20 g</Text>
-      <Text style={styles.text}>• Café o té sin azúcar</Text>
+      <Text style={styles.text}>• Yogur natural descremado 200 g</Text>
+      <Text style={styles.text}>• Granola sin azúcar 30 g</Text>
+      <Text style={styles.text}>• Frutos rojos 80 g</Text>
+      <Text style={styles.text}>• Miel 5 g</Text>
 
       <Text style={styles.section}>Procedimiento:</Text>
-      <Text style={styles.text}>1. Tostar el pan integral.</Text>
-      <Text style={styles.text}>2. Pisar la palta con un poco de sal.</Text>
-      <Text style={styles.text}>3. Cocinar el huevo (hervido o a la plancha).</Text>
-      <Text style={styles.text}>
-        4. Untar una tostada con queso, la otra con palta y colocar el huevo encima.
-      </Text>
+      <Text style={styles.text}>1. Colocar el yogur en un bol.</Text>
+      <Text style={styles.text}>2. Añadir la granola y frutos rojos.</Text>
+      <Text style={styles.text}>3. Endulzar con miel.</Text>
 
-      {/* Tabla de macronutrientes */}
       <Text style={styles.section}>Macronutrientes por alimento:</Text>
       <View style={styles.table}>
         <View style={[styles.row, styles.headerRow]}>
@@ -67,23 +67,39 @@ const TostadasPaltaHuevoScreen = () => {
         ))}
       </View>
 
-      {/* Totales */}
       <Text style={styles.section}>Totales:</Text>
       <Text style={styles.text}>
         HC: {totalHC} g | Proteínas: {totalProtein.toFixed(1)} g | Lípidos: {totalLipid.toFixed(1)} g | Kcal: {totalKcal}
       </Text>
 
-      {/* Tabla de cuadro nutricional por porción */}
       <Text style={styles.section}>Cuadro nutricional por porción:</Text>
       <View style={styles.table}>
         <View style={[styles.row, styles.headerRow]}>
           <Text style={styles.cell}>Nutriente</Text>
           <Text style={styles.cell}>Cantidad</Text>
+          <Text style={styles.cell}>%VD</Text>
         </View>
         {portionNutrition.map((item, index) => (
           <View key={index} style={styles.row}>
             <Text style={styles.cell}>{item.nutrient}</Text>
             <Text style={styles.cell}>{item.amount}</Text>
+            <Text style={styles.cell}></Text>
+          </View>
+        ))}
+      </View>
+
+      <Text style={styles.section}>Para una dieta basada en 2000 kcal:</Text>
+      <View style={styles.table}>
+        <View style={[styles.row, styles.headerRow]}>
+          <Text style={styles.cell}>Macronutriente</Text>
+          <Text style={styles.cell}>Kcal</Text>
+          <Text style={styles.cell}>%VD</Text>
+        </View>
+        {dailyValues.map((item, index) => (
+          <View key={index} style={styles.row}>
+            <Text style={styles.cell}>{item.nutrient}</Text>
+            <Text style={styles.cell}>{item.kcal}</Text>
+            <Text style={styles.cell}>{item.vd}</Text>
           </View>
         ))}
       </View>
@@ -91,7 +107,7 @@ const TostadasPaltaHuevoScreen = () => {
   );
 };
 
-export default TostadasPaltaHuevoScreen;
+export default YogurGranolaScreen;
 
 const styles = StyleSheet.create({
   container: {
