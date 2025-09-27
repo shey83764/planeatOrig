@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Switch, StyleSheet, Pressable, Alert } from 'react-native';
-import { useColorScheme } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Switch,
+  StyleSheet,
+  Pressable,
+  Alert,
+  ScrollView,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from '../theme';
 
@@ -12,28 +21,23 @@ type SettingsScreenDrawerProp = DrawerNavigationProp<DrawerParamList, 'Settings'
 type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function SettingsScreen() {
-  const systemColorScheme = useColorScheme();
-  const isDarkMode = systemColorScheme === 'dark';
-  const [darkModeEnabled, setDarkModeEnabled] = useState(isDarkMode);
-  const [username, setUsername] = useState('Sheyla Perez');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [reminderBreakfast, setReminderBreakfast] = useState(true);
+  const [reminderLunch, setReminderLunch] = useState(true);
+  const [reminderDinner, setReminderDinner] = useState(true);
+  const [shoppingAlerts, setShoppingAlerts] = useState(true);
+  const [recipeNotifications, setRecipeNotifications] = useState(true);
+  const [dietPreference, setDietPreference] = useState('General');
+  const [calorieGoal, setCalorieGoal] = useState('2000');
+  const [proteinGoal, setProteinGoal] = useState('100');
+  const [carbsGoal, setCarbsGoal] = useState('250');
+  const [fatGoal, setFatGoal] = useState('70');
+  const [waterReminder, setWaterReminder] = useState(true);
 
   const navigation = useNavigation<SettingsScreenDrawerProp>();
   const parentNavigation = navigation.getParent<RootStackNavigationProp>();
 
-  const colors = {
-    background: darkModeEnabled ? theme.colors.darkBackground : theme.colors.lightBackground,
-    textPrimary: darkModeEnabled ? theme.colors.textLight : theme.colors.textDark,
-    textSecondary: darkModeEnabled ? theme.colors.textSecondaryDark : theme.colors.textSecondaryLight,
-    inputBackground: darkModeEnabled ? theme.colors.inputDark : theme.colors.inputLight,
-    buttonBackground: theme.colors.primary,
-    buttonText: '#fff',
-  };
-
   const handleSave = () => {
-    if (username.trim().length === 0) {
-      Alert.alert('Error', 'El nombre de usuario no puede estar vacío');
-      return;
-    }
     Alert.alert('Éxito', 'Cambios guardados correctamente');
   };
 
@@ -44,38 +48,128 @@ export default function SettingsScreen() {
     ]);
   };
 
+  const handleChangePassword = () => {
+    Alert.alert('Cambio de contraseña', 'Funcionalidad a implementar');
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.buttonBackground }]}>Configuración</Text>
+    <ScrollView style={styles.container}>
+      {/* Preferencias */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Preferencias</Text>
 
-      <Text style={[styles.label, { color: colors.textSecondary }]}>Nombre</Text>
-      <TextInput
-        value={username}
-        onChangeText={setUsername}
-        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.textPrimary }]}
-        placeholder="Nombre de usuario"
-        placeholderTextColor={darkModeEnabled ? '#888' : '#aaa'}
-      />
+        {/* Notificaciones generales */}
+        <View style={styles.switchRow}>
+          <View style={{ flex: 1 }}>
+            <View style={styles.labelRow}>
+              <Ionicons name="notifications-outline" size={20} color={theme.colors.primary} />
+              <Text style={styles.label}>Notificaciones generales</Text>
+            </View>
+            <Text style={styles.description}>Activa o desactiva todas las alertas de PlanEat</Text>
+          </View>
+          <Switch
+            trackColor={{ false: '#ccc', true: theme.colors.primary }}
+            thumbColor={notificationsEnabled ? theme.colors.primary : '#f4f3f4'}
+            value={notificationsEnabled}
+            onValueChange={setNotificationsEnabled}
+          />
+        </View>
 
-      <View style={styles.switchRow}>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>Modo oscuro</Text>
-        <Switch
-          trackColor={{ false: '#767577', true: theme.colors.primary }}
-          thumbColor={darkModeEnabled ? theme.colors.primary : '#f4f3f4'}
-          ios_backgroundColor="#3e3e3e"
-          value={darkModeEnabled}
-          onValueChange={setDarkModeEnabled}
+        {/* Recordatorios de comidas */}
+        <Text style={[styles.subSectionTitle, { marginTop: 10 }]}>Recordatorios de comidas</Text>
+        <View style={styles.switchRow}>
+          <Text>Desayuno</Text>
+          <Switch value={reminderBreakfast} onValueChange={setReminderBreakfast} />
+        </View>
+        <View style={styles.switchRow}>
+          <Text>Almuerzo</Text>
+          <Switch value={reminderLunch} onValueChange={setReminderLunch} />
+        </View>
+        <View style={styles.switchRow}>
+          <Text>Cena</Text>
+          <Switch value={reminderDinner} onValueChange={setReminderDinner} />
+        </View>
+
+        {/* Alertas adicionales */}
+        <Text style={[styles.subSectionTitle, { marginTop: 10 }]}>Alertas adicionales</Text>
+        <View style={styles.switchRow}>
+          <Text>Lista de compras</Text>
+          <Switch value={shoppingAlerts} onValueChange={setShoppingAlerts} />
+        </View>
+        <View style={styles.switchRow}>
+          <Text>Recetas nuevas</Text>
+          <Switch value={recipeNotifications} onValueChange={setRecipeNotifications} />
+        </View>
+        <View style={styles.switchRow}>
+          <Text>Recordatorio de agua</Text>
+          <Switch value={waterReminder} onValueChange={setWaterReminder} />
+        </View>
+
+        {/* Dieta preferida */}
+        <View style={styles.inputGroup}>
+          <View style={styles.labelRow}>
+            <Ionicons name="restaurant-outline" size={20} color={theme.colors.primary} />
+            <Text style={styles.label}>Dieta preferida</Text>
+          </View>
+          <TextInput
+            value={dietPreference}
+            onChangeText={setDietPreference}
+            style={styles.input}
+            placeholder="Ej: Vegana, Keto, Paleo"
+          />
+          <Text style={styles.description}>Selecciona tu tipo de dieta para personalizar las recetas</Text>
+        </View>
+
+        {/* Objetivos diarios */}
+        <Text style={[styles.subSectionTitle, { marginTop: 10 }]}>Objetivos diarios</Text>
+        <TextInput
+          value={calorieGoal}
+          onChangeText={setCalorieGoal}
+          style={styles.input}
+          placeholder="Calorías diarias"
+          keyboardType="numeric"
+        />
+        <TextInput
+          value={proteinGoal}
+          onChangeText={setProteinGoal}
+          style={styles.input}
+          placeholder="Proteínas (g)"
+          keyboardType="numeric"
+        />
+        <TextInput
+          value={carbsGoal}
+          onChangeText={setCarbsGoal}
+          style={styles.input}
+          placeholder="Carbohidratos (g)"
+          keyboardType="numeric"
+        />
+        <TextInput
+          value={fatGoal}
+          onChangeText={setFatGoal}
+          style={styles.input}
+          placeholder="Grasas (g)"
+          keyboardType="numeric"
         />
       </View>
 
-      <Pressable style={[styles.saveButton, { backgroundColor: colors.buttonBackground }]} onPress={handleSave}>
-        <Text style={[styles.saveButtonText, { color: colors.buttonText }]}>Guardar cambios</Text>
+      {/* Botón Guardar */}
+      <Pressable style={[styles.saveButton, { backgroundColor: theme.colors.primary }]} onPress={handleSave}>
+        <Text style={styles.saveButtonText}>Guardar cambios</Text>
       </Pressable>
 
-      <Pressable style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Cerrar sesión</Text>
-      </Pressable>
-    </View>
+      {/* Seguridad / Logout */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Seguridad</Text>
+        <Pressable style={styles.logoutButton} onPress={handleChangePassword}>
+          <Ionicons name="key-outline" size={18} color="#fff" style={{ marginRight: 8 }} />
+          <Text style={styles.logoutText}>Cambiar contraseña</Text>
+        </Pressable>
+        <Pressable style={[styles.logoutButton, { marginTop: 10 }]} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={18} color="#fff" style={{ marginRight: 8 }} />
+          <Text style={styles.logoutText}>Cerrar sesión</Text>
+        </Pressable>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -83,44 +177,84 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#fff',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 30,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  input: {
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+  card: {
+    backgroundColor: '#f9f9f9',
+    padding: 15,
+    borderRadius: 12,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  sectionTitle: {
     fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 15,
+    color: theme.colors.textDark,
+  },
+  subSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: theme.colors.textDark,
   },
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 12,
+  },
+  inputGroup: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  label: {
+    fontSize: 16,
+    marginLeft: 5,
+    fontWeight: '600',
+  },
+  description: {
+    fontSize: 12,
+    color: '#555',
+    marginTop: 2,
+  },
+  input: {
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 5,
+    marginTop: 5,
   },
   saveButton: {
     borderRadius: 10,
     paddingVertical: 16,
-    marginBottom: 20,
+    marginBottom: 15,
     alignItems: 'center',
   },
   saveButtonText: {
     fontWeight: '700',
     fontSize: 16,
+    color: '#fff',
   },
   logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#e63946',
     padding: 14,
     borderRadius: 10,
-    alignItems: 'center',
+    justifyContent: 'center',
   },
   logoutText: {
     color: '#fff',
