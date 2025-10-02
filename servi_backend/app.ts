@@ -46,7 +46,7 @@ app.use(`${API_PREFIX}/objetivos`, objetivosRoutes);
 app.use(`${API_PREFIX}/progress`, progressRoutes);
 app.use(`${API_PREFIX}/recetas`, recetasRoutes);
 app.use(`${API_PREFIX}/reminders`, remindersRoutes);
-app.use(`${API_PREFIX}/users`, userRoutes);
+app.use(`${API_PREFIX}/user`, userRoutes);
 app.use(`${API_PREFIX}/login`, loginRoutes);
 app.use(`${API_PREFIX}/perfil`, perfilRoutes);
 
@@ -65,7 +65,7 @@ app.get("/", (req: Request, res: Response) => {
       `${API_PREFIX}/progress/...`,
       `${API_PREFIX}/recetas/...`,
       `${API_PREFIX}/reminders/...`,
-      `${API_PREFIX}/users/...`,
+      `${API_PREFIX}/user/...`,
     ],
   });
 });

@@ -1,9 +1,13 @@
-import { Router } from 'express';
-import { getPerfil, updatePerfil } from '../controllers/perfilController';
+// 📁 routes/perfilRoutes.ts
+import { Router } from "express";
+import { getPerfil, updatePerfil } from "../controllers/perfilController";
 
 const router = Router();
 
-router.get('/:userId', getPerfil);
-router.put('/:userId', updatePerfil); // <-- nueva ruta para actualizar
+// GET /api/v1/perfil/:userId → obtener datos del usuario
+router.get("/:userId", getPerfil);
+
+// PUT /api/v1/perfil/:userId → actualizar datos del usuario
+router.put("/:userId", updatePerfil);
 
 export default router;

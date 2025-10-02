@@ -98,51 +98,6 @@ export default function TortillaEspinacaPapasScreen() {
           <Text style={styles.tableCell}></Text>
         </View>
       </View>
-
-      {/* Cuadro nutricional */}
-      <Text style={styles.subtitle}>Cuadro nutricional por porción:</Text>
-      <View style={styles.table}>
-        <View style={[styles.tableRow, styles.tableHeader]}>
-          <Text style={[styles.tableCell, styles.cellNombre]}>Nutriente</Text>
-          <Text style={styles.tableCell}>Cantidad</Text>
-          <Text style={styles.tableCell}>%VD</Text>
-        </View>
-        <View style={[styles.tableRow, styles.rowEven]}>
-          <Text style={[styles.tableCell, styles.cellNombre]}>Carbohidratos (g)</Text>
-          <Text style={styles.tableCell}>70</Text>
-          <Text style={styles.tableCell}></Text>
-        </View>
-        <View style={[styles.tableRow, styles.rowOdd]}>
-          <Text style={[styles.tableCell, styles.cellNombre]}>- Azúcares (g)</Text>
-          <Text style={styles.tableCell}>41.25</Text>
-          <Text style={styles.tableCell}></Text>
-        </View>
-        <View style={[styles.tableRow, styles.rowEven]}>
-          <Text style={[styles.tableCell, styles.cellNombre]}>- Fibra (g)</Text>
-          <Text style={styles.tableCell}>0.5</Text>
-          <Text style={styles.tableCell}></Text>
-        </View>
-        <View style={[styles.tableRow, styles.rowOdd]}>
-          <Text style={[styles.tableCell, styles.cellNombre]}>Proteínas (g)</Text>
-          <Text style={styles.tableCell}>10</Text>
-          <Text style={styles.tableCell}></Text>
-        </View>
-        <View style={[styles.tableRow, styles.rowEven]}>
-          <Text style={[styles.tableCell, styles.cellNombre]}>Grasas totales (g)</Text>
-          <Text style={styles.tableCell}>5</Text>
-          <Text style={styles.tableCell}></Text>
-        </View>
-        <View style={[styles.tableRow, styles.rowOdd]}>
-          <Text style={[styles.tableCell, styles.cellNombre]}>Vitamina</Text>
-          <Text style={styles.tableCell}></Text>
-          <Text style={styles.tableCell}></Text>
-        </View>
-        <View style={[styles.tableRow, styles.rowEven]}>
-          <Text style={[styles.tableCell, styles.cellNombre]}>Mineral</Text>
-          <Text style={styles.tableCell}></Text>
-          <Text style={styles.tableCell}></Text>
-        </View>
-      </View>
     </ScrollView>
   );
 }

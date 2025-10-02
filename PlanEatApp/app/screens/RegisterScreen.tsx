@@ -1,4 +1,4 @@
-// 📁 app/forms/RegisterScreen.tsx
+// 📁 app/screens/RegisterScreen.tsx
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput } from 'react-native-paper';
@@ -9,9 +9,12 @@ import { colors } from '../theme/colors';
 import { fontConfig } from '../theme/fonts';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RegisterScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
@@ -33,106 +36,97 @@ export default function RegisterScreen() {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleRegister = () => {
-    console.log('Registrando usuario:', formData);
+  const handleRegister = async () => {
+    if (!formData.nombre || !formData.apellido || !formData.email || !formData.password || !formData.confirmPassword) {
+      alert("Por favor completa todos los campos obligatorios");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
+
+    try {
+      console.log("Payload que se envía:", formData);
+
+      const response = await axios.post("http://192.168.1.103:3000/api/v1/auth/register", {
+        nombre: formData.nombre.trim() || null,
+        apellido: formData.apellido.trim() || null,
+        email: formData.email.trim() || null,
+        password: formData.password,
+        sexo: formData.sexo || null,
+        edad: formData.edad ? Number(formData.edad) : null,
+        peso: formData.peso ? Number(formData.peso) : null,
+        altura: formData.altura ? Number(formData.altura) : null,
+        actividad: formData.actividad || null,
+        objetivo: formData.objetivo || null,
+        deficit: formData.deficit || null,
+        ganarNivel: formData.ganarNivel || null,
+        mantenerNivel: formData.mantenerNivel || null,
+      });
+
+      console.log("Respuesta del backend:", response.data);
+
+      if (response.status !== 200 && response.status !== 201) {
+        alert(response.data.message || "Error al registrar usuario");
+        return;
+      }
+
+      // 🔹 Guardar datos del usuario en AsyncStorage
+      const usuario = {
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        correo: formData.email,
+        sexo: formData.sexo,
+      };
+      await AsyncStorage.setItem('user', JSON.stringify(usuario));
+
+      // 🔹 Registro exitoso, navegamos al Home (MainDrawer)
+     navigation.reset({
+  index: 0,
+  routes: [{ name: "MainDrawer" }],
+});
+
+    } catch (error: any) {
+      console.error("Error al registrar usuario:", error);
+      if (error.response?.data?.message) {
+        alert(error.response.data.message);
+      } else {
+        alert("Error al registrar usuario. Revisa la conexión al servidor.");
+      }
+    }
   };
 
   return (
     <LinearGradient colors={[colors.lightBackground, colors.primary]} style={styles.container}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={{ padding: 30 }}>
           <Text style={styles.title}>Registro</Text>
 
           {/* Campos básicos */}
-          <TextInput
-            label="Nombre"
-            value={formData.nombre}
-            onChangeText={(val) => handleInputChange('nombre', val)}
-            style={styles.input}
-            placeholderTextColor={colors.white}
-          />
-          <TextInput
-            label="Apellido"
-            value={formData.apellido}
-            onChangeText={(val) => handleInputChange('apellido', val)}
-            style={styles.input}
-            placeholderTextColor={colors.white}
-          />
-          <TextInput
-            label="Email"
-            value={formData.email}
-            onChangeText={(val) => handleInputChange('email', val)}
-            keyboardType="email-address"
-            style={styles.input}
-            placeholderTextColor={colors.white}
-          />
-          <TextInput
-            label="Contraseña"
-            value={formData.password}
-            onChangeText={(val) => handleInputChange('password', val)}
-            secureTextEntry
-            style={styles.input}
-            placeholderTextColor={colors.white}
-          />
-          <TextInput
-            label="Confirmar Contraseña"
-            value={formData.confirmPassword}
-            onChangeText={(val) => handleInputChange('confirmPassword', val)}
-            secureTextEntry
-            style={styles.input}
-            placeholderTextColor={colors.white}
-          />
+          <TextInput label="Nombre" value={formData.nombre} onChangeText={(val) => handleInputChange('nombre', val)} style={styles.input} />
+          <TextInput label="Apellido" value={formData.apellido} onChangeText={(val) => handleInputChange('apellido', val)} style={styles.input} />
+          <TextInput label="Email" value={formData.email} onChangeText={(val) => handleInputChange('email', val)} keyboardType="email-address" style={styles.input} />
+          <TextInput label="Contraseña" value={formData.password} onChangeText={(val) => handleInputChange('password', val)} secureTextEntry style={styles.input} />
+          <TextInput label="Confirmar Contraseña" value={formData.confirmPassword} onChangeText={(val) => handleInputChange('confirmPassword', val)} secureTextEntry style={styles.input} />
 
           {/* Sexo */}
           <Text style={styles.label}>Sexo</Text>
-          <Picker
-            selectedValue={formData.sexo}
-            onValueChange={(val) => handleInputChange('sexo', val)}
-            style={styles.picker}
-            itemStyle={{ color: colors.primary }}
-          >
+          <Picker selectedValue={formData.sexo} onValueChange={(val) => handleInputChange('sexo', val)} style={styles.picker}>
             <Picker.Item label="Selecciona sexo" value="" />
-            <Picker.Item label="Mujer" value="mujer" />
-            <Picker.Item label="Hombre" value="hombre" />
+            <Picker.Item label="Mujer" value="F" />
+            <Picker.Item label="Hombre" value="M" />
           </Picker>
 
           {/* Edad, peso y altura */}
-          <TextInput
-            label="Edad"
-            value={formData.edad}
-            onChangeText={(val) => handleInputChange('edad', val)}
-            keyboardType="numeric"
-            style={styles.input}
-            placeholderTextColor={colors.white}
-          />
-          <TextInput
-            label="Peso (kg)"
-            value={formData.peso}
-            onChangeText={(val) => handleInputChange('peso', val)}
-            keyboardType="numeric"
-            style={styles.input}
-            placeholderTextColor={colors.white}
-          />
-          <TextInput
-            label="Altura (cm)"
-            value={formData.altura}
-            onChangeText={(val) => handleInputChange('altura', val)}
-            keyboardType="numeric"
-            style={styles.input}
-            placeholderTextColor={colors.white}
-          />
+          <TextInput label="Edad" value={formData.edad} onChangeText={(val) => handleInputChange('edad', val)} keyboardType="numeric" style={styles.input} />
+          <TextInput label="Peso (kg)" value={formData.peso} onChangeText={(val) => handleInputChange('peso', val)} keyboardType="numeric" style={styles.input} />
+          <TextInput label="Altura (cm)" value={formData.altura} onChangeText={(val) => handleInputChange('altura', val)} keyboardType="numeric" style={styles.input} />
 
           {/* Nivel de actividad */}
           <Text style={styles.label}>Nivel de actividad</Text>
-          <Picker
-            selectedValue={formData.actividad}
-            onValueChange={(val) => handleInputChange('actividad', val)}
-            style={styles.picker}
-            itemStyle={{ color: colors.primary }}
-          >
+          <Picker selectedValue={formData.actividad} onValueChange={(val) => handleInputChange('actividad', val)} style={styles.picker}>
             <Picker.Item label="Selecciona nivel" value="" />
             <Picker.Item label="Sedentario" value="1.2" />
             <Picker.Item label="Ligero" value="1.375" />
@@ -143,12 +137,7 @@ export default function RegisterScreen() {
 
           {/* Objetivo */}
           <Text style={styles.label}>Objetivo</Text>
-          <Picker
-            selectedValue={formData.objetivo}
-            onValueChange={(val) => handleInputChange('objetivo', val)}
-            style={styles.picker}
-            itemStyle={{ color: colors.primary }}
-          >
+          <Picker selectedValue={formData.objetivo} onValueChange={(val) => handleInputChange('objetivo', val)} style={styles.picker}>
             <Picker.Item label="Selecciona objetivo" value="" />
             <Picker.Item label="Perder grasa" value="perder" />
             <Picker.Item label="Ganar masa muscular" value="ganar" />
@@ -159,12 +148,7 @@ export default function RegisterScreen() {
           {formData.objetivo === 'perder' && (
             <>
               <Text style={styles.label}>Déficit calórico</Text>
-              <Picker
-                selectedValue={formData.deficit}
-                onValueChange={(val) => handleInputChange('deficit', val)}
-                style={styles.picker}
-                itemStyle={{ color: colors.primary }}
-              >
+              <Picker selectedValue={formData.deficit} onValueChange={(val) => handleInputChange('deficit', val)} style={styles.picker}>
                 <Picker.Item label="Ligero" value="ligero" />
                 <Picker.Item label="Moderado" value="moderado" />
                 <Picker.Item label="Agresivo" value="agresivo" />
@@ -172,32 +156,20 @@ export default function RegisterScreen() {
               </Picker>
             </>
           )}
-
           {formData.objetivo === 'ganar' && (
             <>
               <Text style={styles.label}>Nivel de ganancia muscular</Text>
-              <Picker
-                selectedValue={formData.ganarNivel}
-                onValueChange={(val) => handleInputChange('ganarNivel', val)}
-                style={styles.picker}
-                itemStyle={{ color: colors.primary }}
-              >
+              <Picker selectedValue={formData.ganarNivel} onValueChange={(val) => handleInputChange('ganarNivel', val)} style={styles.picker}>
                 <Picker.Item label="Ligero" value="ligero" />
                 <Picker.Item label="Moderado" value="moderado" />
                 <Picker.Item label="Agresivo" value="agresivo" />
               </Picker>
             </>
           )}
-
           {formData.objetivo === 'mantener' && (
             <>
               <Text style={styles.label}>Nivel de mantenimiento</Text>
-              <Picker
-                selectedValue={formData.mantenerNivel}
-                onValueChange={(val) => handleInputChange('mantenerNivel', val)}
-                style={styles.picker}
-                itemStyle={{ color: colors.primary }}
-              >
+              <Picker selectedValue={formData.mantenerNivel} onValueChange={(val) => handleInputChange('mantenerNivel', val)} style={styles.picker}>
                 <Picker.Item label="Estándar" value="estandar" />
                 <Picker.Item label="Ligero ajuste" value="ligero" />
                 <Picker.Item label="Moderado ajuste" value="moderado" />

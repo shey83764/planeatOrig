@@ -85,22 +85,7 @@ const AvenaFrutasScreen = () => {
         ))}
       </View>
 
-      {/* Porcentaje de dieta diaria */}
-      <Text style={styles.section}>Para una dieta de 2000 kcal:</Text>
-      <View style={styles.table}>
-        <View style={[styles.row, styles.headerRow]}>
-          <Text style={styles.cell}>Nutriente</Text>
-          <Text style={styles.cell}>Kcal</Text>
-          <Text style={styles.cell}>%VD</Text>
-        </View>
-        {dailyDiet.map((item, index) => (
-          <View key={index} style={styles.row}>
-            <Text style={styles.cell}>{item.nutrient}</Text>
-            <Text style={styles.cell}>{item.kcal}</Text>
-            <Text style={styles.cell}>{item.percent}</Text>
-          </View>
-        ))}
-      </View>
+     
     </ScrollView>
   );
 };

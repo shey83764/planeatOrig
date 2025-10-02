@@ -1,17 +1,10 @@
-import React, { useEffect } from 'react';
+// 📁 app/screens/LoginScreen.tsx
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSpring, 
-  withTiming, 
-  withRepeat, 
-  withSequence, 
-  Easing 
-} from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withSequence, withTiming, Easing } from 'react-native-reanimated';
 import { colors } from '../theme/colors';
 import { fontConfig, useAppFonts } from '../theme/fonts';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -24,15 +17,14 @@ const SimpleCheckbox: React.FC<{ checked: boolean; onChange: (value: boolean) =>
 );
 
 const LoginScreen: React.FC = () => {
-  // ⚠️ Hooks siempre al inicio
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [rememberMe, setRememberMe] = React.useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
   const fontsLoaded = useAppFonts();
 
-  // ⚠️ Animación del logo
+  // Animación del logo
   const scale = useSharedValue(0);
   useEffect(() => {
     scale.value = withSpring(1, { damping: 5, stiffness: 150 });
@@ -50,22 +42,41 @@ const LoginScreen: React.FC = () => {
     transform: [{ scale: scale.value }],
   }));
 
+  // 🔑 handleLogin integrado
   const handleLogin = async () => {
-    if (email && password) {
-      navigation.navigate('MainDrawer'); // Login exitoso
-    } else {
-      Alert.alert('Error', 'Por favor ingresa email y contraseña');
+    if (!email || !password) {
+      Alert.alert("Por favor completa email y contraseña");
+      return;
+    }
+
+    try {
+      console.log("Datos que se envían al backend:", { email, password });
+
+      const response = await fetch("http://192.168.1.103:3000/api/v1/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.log("Error en login:", data);
+        Alert.alert(data.message || "Error al iniciar sesión");
+        return;
+      }
+
+      Alert.alert("Login exitoso");
+      console.log("Token recibido:", data.token);
+      // Aquí podrías guardar el token en AsyncStorage o en Context
+     navigation.reset({index: 0,routes: [{ name: "MainDrawer" }],});
+
+
+    } catch (error) {
+      console.error("Error en login:", error);
+      Alert.alert("Error al iniciar sesión. Revisa la conexión al servidor.");
     }
   };
-
-  // ⚠️ Placeholder mientras cargan las fuentes
-  if (!fontsLoaded) {
-    return (
-      <LinearGradient colors={[colors.lightBackground, colors.primary]} style={styles.container}>
-        <Text style={{ color: 'white', textAlign: 'center', marginTop: 50 }}>Cargando fuentes...</Text>
-      </LinearGradient>
-    );
-  }
 
   return (
     <LinearGradient colors={[colors.lightBackground, colors.primary]} style={styles.container}>
@@ -105,10 +116,7 @@ const LoginScreen: React.FC = () => {
         <Text style={styles.buttonText}>Iniciar sesión</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.registerButton}
-        onPress={() => navigation.navigate('Register')}
-      >
+      <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Register')}>
         <Text style={styles.registerButtonText}>¿No tienes cuenta? Regístrate</Text>
       </TouchableOpacity>
 
@@ -120,14 +128,7 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', paddingHorizontal: 30 },
   logoContainer: { alignItems: 'center', marginBottom: 40 },
-  logoImage: { 
-    width: 160, 
-    height: 160, 
-    borderRadius: 80, 
-    marginBottom: 10, 
-    borderWidth: 3, 
-    borderColor: colors.white,
-  },
+  logoImage: { width: 160, height: 160, borderRadius: 80, marginBottom: 10, borderWidth: 3, borderColor: colors.white },
   logoText: { color: colors.white, fontSize: 28, fontFamily: fontConfig.title },
   input: { height: 40, borderBottomWidth: 1, borderBottomColor: colors.white, marginBottom: 20, color: colors.white, fontFamily: fontConfig.body },
   checkboxContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },

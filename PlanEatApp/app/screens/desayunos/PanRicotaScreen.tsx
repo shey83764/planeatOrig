@@ -86,22 +86,7 @@ const PanRicotaScreen = () => {
         ))}
       </View>
 
-      {/* Ingesta diaria */}
-      <Text style={styles.section}>Para una dieta basada en 2000 kcal:</Text>
-      <View style={styles.table}>
-        <View style={[styles.row, styles.headerRow]}>
-          <Text style={styles.cell}>Macronutriente</Text>
-          <Text style={styles.cell}>Kcal</Text>
-          <Text style={styles.cell}>%VD</Text>
-        </View>
-        {dailyValues.map((item, index) => (
-          <View key={index} style={styles.row}>
-            <Text style={styles.cell}>{item.nutrient}</Text>
-            <Text style={styles.cell}>{item.kcal}</Text>
-            <Text style={styles.cell}>{item.vd}</Text>
-          </View>
-        ))}
-      </View>
+      
     </ScrollView>
   );
 };

@@ -95,11 +95,27 @@ export const register = async (req: Request, res: Response) => {
 
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
-      return res.status(400).json({ message: "Correo ya registrado" });
+      return res.status(409).json({ message: "Correo ya registrado" });
     }
 
+    // Hasheamos la contraseña
     const hashedPassword = await hashPassword(password);
-    const userId = await insertUser(nombre, apellido, email, hashedPassword, sexo, edad, altura, peso, actividad, objetivo);
+
+    // Insertamos usuario
+    const userId = await insertUser(
+      nombre,
+      apellido,
+      email,
+      hashedPassword,
+      sexo,
+      edad,
+      altura,
+      peso,
+      actividad,
+      objetivo
+    );
+
+    // Insertamos perfil
     await insertUserProfile(userId, nombre, apellido, email, sexo, edad, peso, altura);
 
     // Determinar nivel de actividad según objetivo
@@ -108,9 +124,15 @@ export const register = async (req: Request, res: Response) => {
     if (objetivo === "ganar") nivelActividad = ganarNivel || actividad || null;
     if (objetivo === "mantener") nivelActividad = mantenerNivel || actividad || null;
 
+    // Insertamos objetivos
     await insertUserObjectives(userId, objetivo, nivelActividad);
 
-    return res.status(201).json({ message: "Usuario registrado con éxito" });
+    // ✅ Respondemos con id del usuario
+    return res.status(201).json({
+      message: "Usuario registrado con éxito",
+      id: userId,
+    });
+
   } catch (error) {
     console.error("❌ Error en register:", error);
     return res.status(500).json({ message: "Error interno del servidor" });

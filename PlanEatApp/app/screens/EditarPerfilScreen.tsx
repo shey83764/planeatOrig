@@ -1,179 +1,139 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Pressable,
-  ScrollView,
-} from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { theme } from "../theme"; // ← Importamos el theme centralizado
+// 📁 app/screens/EditarPerfilScreen.tsx
+import React, { useEffect, useState } from "react";
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../navigation/AppNavigator";
+import axios from "axios";
 
-const schema = yup.object().shape({
-  userName: yup.string().required("El nombre es obligatorio"),
-  userEmail: yup
-    .string()
-    .email("Formato de email inválido")
-    .required("El email es obligatorio"),
-  userAge: yup
-    .number()
-    .typeError("Debe ser un número")
-    .positive("Debe ser mayor a 0")
-    .integer("Debe ser un número entero")
-    .required("La edad es obligatoria"),
-  userHeight: yup.string().required("La altura es obligatoria"),
-  userSex: yup.string().required("El sexo es obligatorio"),
-});
+export default function EditarPerfilScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [userData, setUserData] = useState<any>(null);
+  const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
 
-export default function PerfilScreen() {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      userName: "UsuarioEjemplo",
-      userEmail: "usuario@mail.com",
-      userHeight: "170",
-      userSex: "Femenino",
-    },
-    resolver: yupResolver(schema),
-  });
+  // Cargar datos del usuario desde AsyncStorage
+  useEffect(() => {
+    const fetchUser = async () => {
+      const savedUser = await AsyncStorage.getItem("user");
+      if (!savedUser) return;
+      const user = JSON.parse(savedUser);
+      setUserData(user);
 
-  const onSubmit = (data: any) => {
-    alert(`Datos guardados:\n${JSON.stringify(data, null, 2)}`);
+      setNombre(user.nombre || "");
+      setApellido(user.apellido || "");
+      setCorreo(user.correo || "");
+      setPhotoURL(user.photo || ""); // Usamos "photo" del backend
+    };
+
+    fetchUser();
+  }, []);
+
+  // Seleccionar imagen
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setPhotoURL(result.assets[0].uri);
+    }
   };
 
+  // Guardar cambios
+  const handleSave = async () => {
+    try {
+      if (!userData) return;
+
+      const updatedUser = {
+        ...userData,
+        nombre,
+        apellido,
+        correo,
+        photo: photoURL, // mapeamos al campo correcto para MySQL
+      };
+
+      // Actualizar en backend
+      await axios.put(`http://192.168.1.103:3000/api/v1/perfil/${userData.id}`, updatedUser);
+
+      // Guardar en AsyncStorage
+      await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
+
+      Alert.alert("Éxito", "Perfil actualizado correctamente");
+
+      // Navegar al MainDrawer automáticamente
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainDrawer" }],
+      });
+    } catch (error) {
+      console.error("Error al actualizar perfil:", error);
+      Alert.alert("Error", "No se pudo actualizar el perfil. Intenta nuevamente.");
+    }
+  };
+
+  if (!userData) return <Text style={styles.loading}>Cargando...</Text>;
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Editar perfil</Text>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={pickImage}>
+        <Image
+          source={{ uri: photoURL || "https://i.pravatar.cc/150?u=default" }}
+          style={styles.avatar}
+        />
+      </TouchableOpacity>
 
-      {/* Usuario */}
-      <Text style={styles.label}>Usuario</Text>
-      <Controller
-        control={control}
-        name="userName"
-        render={({ field: { onChange, value } }) => (
-          <TextInput style={styles.input} value={value} onChangeText={onChange} />
-        )}
+      <TextInput
+        style={styles.input}
+        value={nombre}
+        onChangeText={setNombre}
+        placeholder="Nombre"
       />
-      {errors.userName && <Text style={styles.error}>{errors.userName.message}</Text>}
-
-      {/* Email */}
-      <Text style={styles.label}>Email</Text>
-      <Controller
-        control={control}
-        name="userEmail"
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            style={styles.input}
-            value={value}
-            onChangeText={onChange}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        )}
+      <TextInput
+        style={styles.input}
+        value={apellido}
+        onChangeText={setApellido}
+        placeholder="Apellido"
       />
-      {errors.userEmail && <Text style={styles.error}>{errors.userEmail.message}</Text>}
-
-      {/* Edad */}
-      <Text style={styles.label}>Edad</Text>
-      <Controller
-        control={control}
-        name="userAge"
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            style={styles.input}
-            value={value !== undefined ? String(value) : ""}
-            onChangeText={onChange}
-            keyboardType="numeric"
-          />
-        )}
+      <TextInput
+        style={styles.input}
+        value={correo}
+        onChangeText={setCorreo}
+        placeholder="Correo"
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
-      {errors.userAge && <Text style={styles.error}>{errors.userAge.message}</Text>}
 
-      {/* Altura */}
-      <Text style={styles.label}>Altura</Text>
-      <Controller
-        control={control}
-        name="userHeight"
-        render={({ field: { onChange, value } }) => (
-          <TextInput style={styles.input} value={value} onChangeText={onChange} />
-        )}
-      />
-      {errors.userHeight && <Text style={styles.error}>{errors.userHeight.message}</Text>}
-
-      {/* Sexo */}
-      <Text style={styles.label}>Sexo</Text>
-      <Controller
-        control={control}
-        name="userSex"
-        render={({ field: { onChange, value } }) => (
-          <TextInput style={styles.input} value={value} onChangeText={onChange} />
-        )}
-      />
-      {errors.userSex && <Text style={styles.error}>{errors.userSex.message}</Text>}
-
-      {/* Botón Guardar */}
-      <Pressable style={styles.saveButton} onPress={handleSubmit(onSubmit)}>
-        <Text style={styles.saveButtonText}>Guardar</Text>
-      </Pressable>
-    </ScrollView>
+      <TouchableOpacity style={styles.button} onPress={handleSave}>
+        <Text style={styles.buttonText}>Guardar</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 60,
-    backgroundColor: theme.colors.background,
-    flexGrow: 1,
-  },
-  title: {
-    fontFamily: theme.fonts.title,
-    color: theme.colors.title,
-    fontSize: 24,
-    marginBottom: 30,
-    textAlign: "center",
-  },
-  label: {
-    fontFamily: theme.fonts.subtitle,
-    color: theme.colors.body,
-    fontSize: 16,
-    marginBottom: 5,
-  },
+  container: { flex: 1, alignItems: "center", padding: 20 },
+  avatar: { width: 120, height: 120, borderRadius: 60, marginBottom: 20 },
   input: {
-    backgroundColor: "#F4F6F6",
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderRadius: 12,
+    width: "100%",
     borderWidth: 1,
-    borderColor: "#E0E0E0",
-    marginBottom: 10,
-    fontSize: 16,
-    color: theme.colors.body,
-    fontFamily: theme.fonts.body,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 15,
   },
-  error: {
-    color: "red",
-    fontSize: 13,
-    marginBottom: 10,
-    fontFamily: theme.fonts.body,
-  },
-  saveButton: {
-    marginTop: 20,
-     backgroundColor: theme.colors.primary,
-    paddingVertical: 14,
-    borderRadius: 20,
+  button: {
+    backgroundColor: "#00c39a",
+    padding: 15,
+    borderRadius: 30,
+    width: "100%",
     alignItems: "center",
   },
-  saveButtonText: {
-    fontFamily: theme.fonts.button,
-    color: "#fff",
-    fontSize: 16,
-  },
+  buttonText: { color: "#fff", fontWeight: "bold" },
+  loading: { textAlign: "center", marginTop: 50, fontSize: 18 },
 });

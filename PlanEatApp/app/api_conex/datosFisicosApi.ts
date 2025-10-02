@@ -1,4 +1,4 @@
-import { apiFetch } from "../api";
+import { ApiFetch } from "./api";
 
 export const guardarDatosUsuario = async (data: {
   user_id: number;
@@ -7,7 +7,7 @@ export const guardarDatosUsuario = async (data: {
   carbohidratos: number;
   grasas: number;
 }) => {
-  return apiFetch("/api/datos", {
+  return ApiFetch("/api/datos", {
     method: "POST",
     body: JSON.stringify(data),
   });
