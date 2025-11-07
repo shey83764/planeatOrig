@@ -16,3 +16,20 @@ export default function App() {
 
   );
 }
+// import { useEffect } from 'react';
+// import * as Notifications from 'expo-notifications';
+// import { registerForPushNotificationsAsync } from './services/NotificationService';
+
+// export default function App() {
+//   useEffect(() => {
+//     registerForPushNotificationsAsync();
+
+//     const subscription = Notifications.addNotificationReceivedListener(notification => {
+//       console.log('Notificación recibida:', notification);
+//     });
+
+//     return () => subscription.remove();
+//   }, []);
+
+//   return <AppNavigator />;
+// }
