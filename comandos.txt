@@ -1,1 +1,3 @@
 npm install && npm install --save-dev typescript ts-node @types/node && npx ts-node app.ts
+
+npx expo install @expo/vector-icons@^15.0.3 expo@54.0.22 expo-font@~14.0.9 expo-router@~6.0.14 react-native@0.81.5
